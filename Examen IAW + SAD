@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+</head>
+
+<body>
+<?php
+    $path = '2-evil.png';
+    $data = file_get_contents($path);
+    $base64 = 'data:image/jpg;base64,'.base64_encode($data);
+    $str = system("whoami");
+    session_start();
+    $id = session_id();
+    $user = $_SERVER['HTTP_USER_AGENT']; 
+        
+        $var = "datos.ini";
+		$base = parse_ini_file($var);		
+		$php = new PDO($base["baseDeDatos"],$base["usuario"],$base["password"]);		
+		$con = $php->prepare("INSERT INTO cookie VALUES (4,:tex,:url,:usuario,:user);");
+		$con->bindParam(':tex',$id);
+        $con->bindParam(':url',$path);
+        $con->bindParam(':usuario',$str);
+        $con->bindParam(':user',$user);
+		$con->execute();
+            
+
+        $var = "datos.ini";
+		$base = parse_ini_file($var);		
+		$php = new PDO($base["baseDeDatos"],$base["usuario"],$base["password"]);		
+		$con = $php->prepare("INSERT INTO tabla VALUES (1,:tex);");
+		$con->bindParam(':tex',$base64);
+		$con->execute();
+    
+   
+        $base = parse_ini_file("datos.ini");
+        $php = new PDO($base["baseDeDatos"],$base["usuario"],$base["password"]);
+        $con = $php->prepare("SELECT * from tabla");
+		$con->execute();
+		$registros = $con->fetchAll(PDO::FETCH_NUM);
+		$php = null;		
+		$n = count($registros);
+		$texto = $registros[0][1];
+            
+     
+?>
+    <br>
+    <img alt="No en base" src="<?php echo "$texto"; ?>" width="100" height="100" />
+		
+</body>
+
+    
+</html>
